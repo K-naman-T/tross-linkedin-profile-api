@@ -330,9 +330,21 @@ def _fetch(target: str) -> ProfileResponse:
     try:
         data = client.get_profile(target)
     except LinkedInAuthError:
-        # Session cookie died (LinkedIn invalidates fast). Self-heal: re-read a
-        # fresh li_at from the local Firefox session and retry once.
-        _CLIENT = _refresh_client()
+        # Session cookie died (LinkedIn kills the li_at after one Voyager hit when
+        # the cookie was borrowed from a concurrently-open browser). Preserve the
+        # first result from cache so the demo remains servable.
+        try:
+            cached = client._cache.get(LinkedInVoyagerClient._normalize_slug(target))
+            if cached is not None:
+                return ProfileResponse(
+                    data=cached,
+                    fetched_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                )
+        except Exception:
+            pass
+        new_client = _refresh_client()
+        if new_client is not None:
+            _CLIENT = new_client
         if _CLIENT is None:
             raise HTTPException(
                 status_code=401,
