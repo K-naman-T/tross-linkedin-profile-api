@@ -51,18 +51,14 @@
 <body>
 
 <div class="mast">
-  <div class="kicker">Tross Research · Story Bible No. 1 · 2026-08-31</div>
   <h1>Reverse-Engineering<br>LinkedIn's Voyager API</h1>
-  <div class="subtitle">How a hand-built <code>curl_cffi</code> client talks to the endpoint LinkedIn's own frontend uses — and why the session dies after one hit in this unfair cyberworld.</div>
-  <div class="authors">Naman — Independent Researcher</div>
-  <div class="affil">Tross Software Engineer Take-Home · No browser automation · Dedicated session · Low volume</div>
-  <div class="meta"><span>Scope: Reverse-engineering arc only</span><span>·</span><span>Failures recorded briefly</span><span>·</span><span>5–6 pp. print</span></div>
+  <div class="authors">Naman — 2026-08-31</div>
 </div>
 
 <div class="abstract">
   <b>Abstract —</b> LinkedIn exposes no public profile API. Its web app, however, fetches every public profile from an internal REST endpoint. By watching live DevTools XHR, we recovered that endpoint, its CSRF recipe, and its flat <code>included[]</code> shape, then built a thin, dependency-light <code>curl_cffi</code> client that speaks it without Selenium, Playwright, or any headless browser. The client is deployed live over HTTPS, gated by <code>API_KEY</code>, and verified by a real fetch of <code>satyanadella</code> (Chairman &amp; CEO at Microsoft) on 2026-08-31. The session is single-use — LinkedIn revokes a borrowed browser <code>li_at</code> after one Voyager hit — so we keep <code>csrf-token</code> in lockstep with a rotating <code>JSESSIONID</code> and preserve the first result in a TTL cache. This bible is the append-only record of that arc.
 </div>
-<p class="ccs"><span>CCS:</span> reverse-engineering · web API · CSRF · TLS fingerprinting · anti-automation · <span>Live:</span> <a href="https://nyc-direct-jail-those.trycloudflare.com/health">nyc-direct-jail-those.trycloudflare.com</a> · <span>Code:</span> <a href="https://github.com/K-naman-T/tross-linkedin-profile-api">K-naman-T/tross-linkedin-profile-api</a></p>
+
 
 <div class="two">
 
@@ -117,7 +113,7 @@
 
 <h2>5. Deployment — How it runs live</h2>
 <h3>Decision · 2026-08-31 — Prod path vs dev path</h3>
-<p>Dev: read the full jar from the local Firefox profile. Prod (headless VPS, no Firefox): ship the entire jar as <code>cookies.json</code> or <code>LINKEDIN_COOKIES</code> env — see <code>cookies.json.example</code>. <code>LI_AT_COOKIE</code> alone works but is weakest fidelity. The API is gated: <code>API_KEY</code> required as <code>Authorization: Bearer …</code> or <code>?key=</code> (<code>main.py:62</code>), else <code>401</code> — not an open relay. <span class="badge">12 passing</span> <code>pytest</code> (offline parse + ASGI auth).</p>
+<p>Dev: full jar from Firefox. Prod: <code>cookies.json</code> or <code>LINKEDIN_COOKIES</code>. Gated by <code>API_KEY</code> (<code>main.py:62</code>).</p>
 <pre>curl -H "Authorization: Bearer $API_KEY" \
   "https://nyc-direct-jail-those.trycloudflare.com/profile?slug=satyanadella"
 → {"status":"success","source":"linkedin_voyager_api",
