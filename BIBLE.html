@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tross Voyager — Story Bible No. 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root{ --fg:#1a1a1a; --muted:#5a5a5a; --rule:#d9d2c7; --accent:#8a1c17; --bg:#fffef9; --code:#f6f3ea; }
+  html{ background:var(--bg); color:var(--fg); }
+  body{ font-family:"Times New Roman", Times, Georgia, serif; font-size:10.5pt; line-height:1.55; max-width:740px; margin:0 auto; padding:28px 22px 40px; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  a{ color:var(--accent); text-decoration:none; border-bottom:1px solid #e8ddd0; }
+  a:hover{ border-color:var(--accent); }
+  /* Title block */
+  .mast{ text-align:center; border-bottom:1.5px solid var(--fg); padding-bottom:18px; margin-bottom:18px; }
+  .kicker{ font-family:"EB Garamond", Georgia, serif; font-variant:small-caps; letter-spacing:.18em; font-size:8.5pt; color:var(--muted); }
+  h1{ font-family:"EB Garamond", Georgia, serif; font-weight:800; font-size:26pt; line-height:1.05; margin:8px 0 6px; letter-spacing:-.02em; }
+  .subtitle{ font-style:italic; color:var(--muted); font-size:11pt; margin-bottom:10px; }
+  .authors{ font-variant:small-caps; letter-spacing:.08em; font-size:9.5pt; }
+  .affil{ font-size:8.5pt; color:var(--muted); }
+  .meta{ display:flex; justify-content:center; gap:18px; font-size:8pt; color:var(--muted); margin-top:8px; font-variant:small-caps; letter-spacing:.06em; }
+  /* Abstract */
+  .abstract{ background:#fbf8ef; border:1px solid var(--rule); border-left:3px solid var(--accent); padding:12px 14px; margin:18px 0; font-size:9.5pt; line-height:1.5; }
+  .abstract b{ font-variant:small-caps; letter-spacing:.06em; }
+  .ccs{ font-size:8pt; color:var(--muted); margin:0 0 14px; }
+  .ccs span{ font-variant:small-caps; }
+  h2{ font-family:"EB Garamond", Georgia, serif; font-size:14pt; font-weight:600; margin:22px 0 6px; border-bottom:1px solid var(--rule); padding-bottom:4px; }
+  h3{ font-variant:small-caps; letter-spacing:.07em; font-size:9.5pt; color:var(--muted); margin:14px 0 4px; border-bottom:none; }
+  p{ margin:6px 0; text-align:justify; hyphens:auto; }
+  .dropcap:first-letter{ font-family:"EB Garamond", serif; float:left; font-size:38pt; line-height:.85; padding:4px 6px 0 0; color:var(--accent); }
+  .wall{ border-left:2.5px solid var(--accent); background:#fdf6f0; padding:7px 10px; margin:8px 0; font-size:9pt; }
+  .wall b{ color:var(--accent); }
+  figure{ margin:10px 0; border:1px solid var(--rule); background:white; padding:8px; }
+  figcaption{ font-size:7.5pt; color:var(--muted); text-align:center; margin-top:4px; font-style:italic; }
+  pre{ background:var(--code); border:1px solid var(--rule); padding:9px 10px; font-family:"JetBrains Mono", ui-monospace, monospace; font-size:8pt; line-height:1.45; overflow-x:auto; white-space:pre-wrap; word-break:break-word; }
+  code{ font-family:"JetBrains Mono", ui-monospace, monospace; font-size:8.5pt; background:var(--code); padding:1px 3px; border-radius:3px; }
+  .fn{ font-size:7.5pt; color:var(--muted); border-top:1px solid var(--rule); padding-top:6px; margin-top:10px; }
+  .two{ column-count:1; }
+  .appendix{ background:#fbfaf6; border:1px dashed var(--rule); padding:8px 10px; margin-top:10px; }
+  .badge{ display:inline-block; font-size:7pt; letter-spacing:.08em; font-variant:small-caps; background:#1a1a1a; color:white; padding:2px 6px; border-radius:10px; }
+  @media print{
+    @page{ size:A4; margin:18mm 16mm 18mm 16mm; }
+    body{ max-width:none; padding:0; font-size:9.5pt; }
+    .two{ column-count:2; column-gap:18px; }
+    .mast, .abstract, figure{ break-inside:avoid; }
+    a{ border-bottom:none; }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="kicker">Tross Research · Story Bible No. 1 · 2026-08-31</div>
+  <h1>Reverse-Engineering<br>LinkedIn's Voyager API</h1>
+  <div class="subtitle">How a hand-built <code>curl_cffi</code> client talks to the endpoint LinkedIn's own frontend uses — and why the session dies after one hit in this unfair cyberworld.</div>
+  <div class="authors">Naman — Independent Researcher</div>
+  <div class="affil">Tross Software Engineer Take-Home · No browser automation · Dedicated session · Low volume</div>
+  <div class="meta"><span>Scope: Reverse-engineering arc only</span><span>·</span><span>Failures recorded briefly</span><span>·</span><span>5–6 pp. print</span></div>
+</div>
+
+<div class="abstract">
+  <b>Abstract —</b> LinkedIn exposes no public profile API. Its web app, however, fetches every public profile from an internal REST endpoint. By watching live DevTools XHR, we recovered that endpoint, its CSRF recipe, and its flat <code>included[]</code> shape, then built a thin, dependency-light <code>curl_cffi</code> client that speaks it without Selenium, Playwright, or any headless browser. The client is deployed live over HTTPS, gated by <code>API_KEY</code>, and verified by a real fetch of <code>satyanadella</code> (Chairman &amp; CEO at Microsoft) on 2026-08-31. The session is single-use — LinkedIn revokes a borrowed browser <code>li_at</code> after one Voyager hit — so we keep <code>csrf-token</code> in lockstep with a rotating <code>JSESSIONID</code> and preserve the first result in a TTL cache. This bible is the append-only record of that arc.
+</div>
+<p class="ccs"><span>CCS:</span> reverse-engineering · web API · CSRF · TLS fingerprinting · anti-automation · <span>Live:</span> <a href="https://nyc-direct-jail-those.trycloudflare.com/health">nyc-direct-jail-those.trycloudflare.com</a> · <span>Code:</span> <a href="https://github.com/K-naman-T/tross-linkedin-profile-api">K-naman-T/tross-linkedin-profile-api</a></p>
+
+<div class="two">
+
+<p class="dropcap">We started where every break starts: a normal browser, a public profile, and DevTools open on Network → XHR. What follows is not a tutorial for bulk harvesting, but a forensic log of how the private API was found, how it authenticates, and how it punishes you — written as a -style append-only bible inside a classic paper skin.</p>
+
+<h2>1. Capture — 2026-08-30</h2>
+<h3>Decision · 2026-08-30 — Use the frontend's own endpoint</h3>
+<p>Login in a clean Firefox dedicated, open <code>linkedin.com/in/satyanadella</code>, filter <code>XHR/Fetch</code>. The app issues:</p>
+<pre>GET https://www.linkedin.com/voyager/api/identity/dash/profiles
+  ?q=memberIdentity
+  &amp;memberIdentity={slug}
+  &amp;decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfileWithEntities-93</pre>
+<p>Two endpoints matter: <code>dash/profiles</code> (primary profile + experience/education/skills/certs/languages/images/about) and <code>profileContactInfo</code> (email/websites/twitter — gated, often empty). The response is a normalized store: a flat <code>included[]</code> array; the primary profile is the entry whose <code>entityUrn</code> contains <code>fsd_profile:</code> and <code>firstName</code>.</p>
+<figure>
+<svg viewBox="0 0 700 86" width="100%" height="86" xmlns="http://www.w3.org/2000/svg" style="font-family:'JetBrains Mono',monospace">
+  <rect x="10" y="10" width="220" height="56" rx="6" fill="#fff" stroke="#d9d2c7"/><text x="120" y="30" text-anchor="middle" font-size="8">Browser</text><text x="120" y="44" text-anchor="middle" font-size="7" fill="#5a5a5a">DevTools → XHR</text>
+  <line x1="230" y1="38" x2="270" y2="38" stroke="#1a1a1a" marker-end="url(#a)"/><text x="250" y="30" font-size="6" text-anchor="middle">recover</text>
+  <rect x="270" y="10" width="200" height="56" rx="6" fill="#fff" stroke="#d9d2c7"/><text x="370" y="30" text-anchor="middle" font-size="8">Voyager dash/profiles</text><text x="370" y="44" text-anchor="middle" font-size="7" fill="#5a5a5a">q=memberIdentity</text>
+  <line x1="470" y1="38" x2="510" y2="38" stroke="#1a1a1a" marker-end="url(#a)"/>
+  <rect x="510" y="10" width="180" height="56" rx="6" fill="#fff" stroke="#d9d2c7"/><text x="600" y="30" text-anchor="middle" font-size="8">curl_cffi client</text><text x="600" y="44" text-anchor="middle" font-size="7" fill="#5a5a5a">no browser</text>
+  <defs><marker id="a" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto"><path d="M0 0 L10 3 L0 6" fill="none" stroke="#1a1a1a"/></marker></defs>
+</svg>
+  <figcaption>Fig. 1 — Recovery: browser XHR → recovered endpoint → hand-built client.</figcaption>
+</figure>
+
+<h2>2. Auth recipe — Wall 1: 403 CSRF</h2>
+<h3>Wall · 2026-08-30 — Every naive scraper dies here</h3>
+<div class="wall"><b>Wall 1:</b> Sending only <code>li_at</code> returns <code>403 CSRF check failed</code>. LinkedIn checks <code>csrf-token == JSESSIONID</code> cookie (quotes stripped).</div>
+<p><b>Recipe (the part docs don't tell you):</b> <code>li_at</code> (login) + <code>JSESSIONID</code> (same session) + <code>csrf-token</code> header equal to <code>JSESSIONID.strip('"')</code> + <code>x-restli-protocol-version: 2.0.0</code> + <code>accept: application/vnd.linkedin.normalized+json+2.1</code>. If the jar lacks <code>JSESSIONID</code> we synthesize <code>:{19–20 digits}</code> — it is matched, not validated. We send the <em>full</em> <code>linkedin.com</code> jar (24 cookies: <code>lidc, bcookie, dfpfpt…</code>), not a leaked token — that is the fidelity fix. Implemented in <code>linkedin_scraper.py:149</code> via <code>curl_cffi.Session(impersonate="chrome")</code> for JA3.</p>
+
+<h2>3. Response shape</h2>
+<h3>Decision · 2026-08-30 — Flat store dispatch</h3>
+<p>Primary profile: <code>entityUrn</code> with <code>fsd_profile:</code>. Siblings keyed by <code>$type</code> suffix: <code>…Position, …Education, …Skill, …Certification, …Language</code>. <code>_find_profile</code> + fallback on <code>publicIdentifier == slug</code> handles schema drift. <code>profilePicture.vectorImage</code> → first artifact builds a usable URL; <code>coverPhoto</code> similarly.</p>
+<figure>
+<svg viewBox="0 0 700 70" width="100%" height="70" xmlns="http://www.w3.org/2000/svg" style="font-family:'JetBrains Mono',monospace">
+  <rect x="10" y="10" width="680" height="42" rx="6" fill="#fbf8ef" stroke="#d9d2c7"/>
+  <text x="20" y="28" font-size="8">included[] →</text>
+  <rect x="110" y="16" width="110" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="165" y="34" font-size="7" text-anchor="middle">fsd_profile: Ada</text>
+  <rect x="235" y="16" width="90" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="280" y="34" font-size="7" text-anchor="middle">…Position</text>
+  <rect x="340" y="16" width="90" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="385" y="34" font-size="7" text-anchor="middle">…Education</text>
+  <rect x="445" y="16" width="70" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="480" y="34" font-size="7" text-anchor="middle">…Skill</text>
+  <rect x="530" y="16" width="90" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="575" y="34" font-size="7" text-anchor="middle">…Certification</text>
+  <rect x="635" y="16" width="45" height="30" rx="4" fill="white" stroke="#d9d2c7"/><text x="657" y="34" font-size="7" text-anchor="middle">…Lang</text>
+</svg>
+  <figcaption>Fig. 2 — Flat <code>included[]</code> dispatched by <code>$type</code> suffix.</figcaption>
+</figure>
+
+<h2>4. Walls, briefly</h2>
+<div class="wall"><b>Wall 2 — Decoration pin:</b> <code>FullProfileWithEntities-93</code> rotates every 4–8 weeks. Fix: re-capture from live traffic; the client surfaces a clear <code>200 with no included</code> error.</div>
+<div class="wall"><b>Wall 3 — Fingerprint lie:</b> <code>x-li-track: {osName:"Windows"}</code> while <code>sec-ch-ua-platform:"macOS"</code>. Fraud score. Fix: <code>osName → "macOS"</code> to match UA.</div>
+<div class="wall"><b>Wall 4 — Single-use session:</b> LinkedIn revokes a borrowed browser <code>li_at</code> after one Voyager hit (the first <code>satyanadella</code> succeeded, the next distinct slug <code>401</code> and the browser's <code>li_at</code> vanished). Fixes: (i) <code>_sync_csrf()</code> — keep <code>csrf-token</code> in lockstep with a rotating <code>JSESSIONID</code> Set-Cookie, retry once on <code>403</code>; (ii) preserve the first result in a TTL cache so the demo stays servable after logout; (iii) operational: log in, immediately warm the needed profile, keep volume low.</div>
+
+<h2>5. Deployment — How it runs live</h2>
+<h3>Decision · 2026-08-31 — Prod path vs dev path</h3>
+<p>Dev: read the full jar from the local Firefox profile. Prod (headless VPS, no Firefox): ship the entire jar as <code>cookies.json</code> or <code>LINKEDIN_COOKIES</code> env — see <code>cookies.json.example</code>. <code>LI_AT_COOKIE</code> alone works but is weakest fidelity. The API is gated: <code>API_KEY</code> required as <code>Authorization: Bearer …</code> or <code>?key=</code> (<code>main.py:62</code>), else <code>401</code> — not an open relay. <span class="badge">12 passing</span> <code>pytest</code> (offline parse + ASGI auth).</p>
+<pre>curl -H "Authorization: Bearer $API_KEY" \
+  "https://nyc-direct-jail-those.trycloudflare.com/profile?slug=satyanadella"
+→ {"status":"success","source":"linkedin_voyager_api",
+   "data":{"basic":{"full_name":"Satya Nadella",
+   "headline":"Chairman and CEO at Microsoft"}, … } }</pre>
+<p style="font-size:8pt; color:var(--muted);">Evidence 2026-08-31 16:43 UTC — <code>LIVE TEST PASS: got real profile for 'Satya Nadella'</code> via <code>live_test.sh</code> over the public HTTPS tunnel (<code>cloudflared</code> → <code>uvicorn</code>).</p>
+
+<h2>6. Ethics &amp; The Unfair Cyberworld</h2>
+<p>This is <em>participant-observation research</em> — we document the exact header recipe LinkedIn's own frontend uses, as captured live. The act violates LinkedIn ToS §8.2 (automated access). Under U.S. precedent (<em>hiQ Labs v. LinkedIn</em>, 9th Cir.) scraping *public* data is lawful, but storing EU personal data implicates GDPR. Therefore: dedicated dedicated, low volume, TTL cache only (no disk persistence), no resale, and full disclosure here. The unfairness is the point — a low-resource actor can only see the same endpoint by mimicking the browser — so we record it plainly, with mitigations, rather than pretending the wall doesn't exist.</p>
+
+</div><!-- /two -->
+
+<div class="appendix">
+  <h2 style="margin-top:0;">Appendices</h2>
+  <h3>A — Raw request (verbatim, <code>linkedin_scraper.py:77</code>)</h3>
+<pre>GET /voyager/api/identity/dash/profiles?q=memberIdentity
+    &amp;memberIdentity=satyanadella
+    &amp;decorationId=com.linkedin.voyager.dash.deco.identity.profile.FullProfileWithEntities-93
+Host: www.linkedin.com
+accept: application/vnd.linkedin.normalized+json+2.1
+x-restli-protocol-version: 2.0.0
+x-li-lang: en_US
+csrf-token: :7664662659876785587
+cookie: li_at=AQFA…; JSESSIONID=:7664662659876785587; lidc=…; bcookie=…</pre>
+  <h3>B — Minimal <code>included[]</code> excerpt</h3>
+<pre>{"entityUrn":"urn:li:fsd_profile:AB00","firstName":"Ada","headline":"Mathematician",…}
+{"$type":"com.linkedin.voyager.identity.profile.Position","title":"Engineer","companyName":"Analytical Engine"}</pre>
+  <h3>C — Tally submission links (required)</h3>
+  <p><code>Hosted API URL:</code> <a href="https://nyc-direct-jail-those.trycloudflare.com">https://nyc-direct-jail-those.trycloudflare.com</a> &nbsp;·&nbsp; <code>GitHub:</code> <a href="https://github.com/K-naman-T/tross-linkedin-profile-api">K-naman-T/tross-linkedin-profile-api</a></p>
+  <h3>D — Verification</h3>
+  <p><code>pytest tests/test_client.py test_api_e2e.py -q</code> → <b>12 passed, 1 skipped</b> (live gate). <code>bash live_test.sh</code> → <b>LIVE TEST PASS</b>. <code>.gitignore</code> excludes <code>.env, cookies.json, bookmarklet.html, test_bookmarklet_gd.py</code> — the submitted repo is secret-free.</p>
+</div>
+
+<p class="fn">Bible No. 1 — Tross Voyager arc only. Failures recorded briefly (§4). Single-file HTML, print to PDF via Chrome. Fonts: EB Garamond + Latin Modern Roman (fallback Times). No external JS. — 2026-08-31, Naman.</p>
+
+</body>
+</html>
