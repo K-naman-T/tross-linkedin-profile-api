@@ -179,7 +179,7 @@ class LinkedInVoyagerClient:
             "sec-ch-ua-platform": '"macOS"',
             "x-li-track": _json.dumps({
                 "clientVersion": "1.0.0",
-                "osName": "Windows",
+                "osName": "macOS",
                 "deviceFormFactor": "DESKTOP",
                 "mpName": "voyager-web",
                 "displayDensity": 1,
@@ -189,6 +189,18 @@ class LinkedInVoyagerClient:
         })
         s.headers.update(headers)
         return s
+
+    def _sync_csrf(self) -> None:
+        """Keep csrf-token header in sync with the live JSESSIONID cookie.
+
+        curl_cffi auto-stores Set-Cookie updates into the session jar, but the
+        csrf-token header is ours. If JSESSIONID rotates on a response and we
+        don't follow, the NEXT request sends a stale csrf -> 403 -> appears as
+        'logged out after one hit'.
+        """
+        js = self._session.cookies.get("JSESSIONID")
+        if js:
+            self._session.headers["csrf-token"] = js.strip('"')
 
     # -- public API --------------------------------------------------------
     def get_profile(self, slug: str) -> Dict[str, Any]:
@@ -227,6 +239,9 @@ class LinkedInVoyagerClient:
             try:
                 r = self._session.get(url, params=params, timeout=self._timeout,
                                       allow_redirects=False)
+                # JSESSIONID may have rotated in this response (Set-Cookie). Keep
+                # the csrf-token header in lockstep or the NEXT request 403s.
+                self._sync_csrf()
             except Exception as e:
                 if "timed out" in str(e).lower():
                     raise LinkedInUpstreamError(f"Request timed out: {e}") from e
@@ -271,6 +286,12 @@ class LinkedInVoyagerClient:
                     "invalid. Refresh li_at + JSESSIONID from a logged-in browser."
                 )
             if r.status_code in (401, 403):
+                if attempt == 0:
+                    # Resync may have just fixed a csrf drift. Retry once before
+                    # treating the session as dead. If the li_at is truly revoked,
+                    # the retry will 401/403 again and we surface it.
+                    time.sleep(1.0)
+                    continue
                 raise LinkedInAuthError(
                     "LinkedIn returned 401/403 — cookies expired or invalid. "
                     "Refresh li_at + JSESSIONID from a logged-in browser session."
