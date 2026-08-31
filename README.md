@@ -115,7 +115,8 @@ session looks legitimate:
 - `LINKEDIN_COOKIES` — the same JSON in an env var (preferred for secret managers).
 
 `LI_AT_COOKIE` alone still works but is the weakest fidelity; use the full jar in
-production. Keep `cookies.json` out of git (already gitignored).
+production. Keep `cookies.json` out of git (already gitignored). See
+`cookies.json.example` for the expected shape.
 
 Run tests:
 ```bash
