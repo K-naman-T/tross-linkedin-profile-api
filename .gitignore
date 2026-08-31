@@ -1,0 +1,25 @@
+# Environment
+.env
+cookies.json
+*.pyc
+__pycache__/
+.venv/
+venv/
+
+# Dev-only tooling (excluded from the submission)
+# These drive/assist a real browser and are NOT part of the no-browser-automation
+# API. bookmarklet.html is a manual cookie-extraction helper; test_bookmarklet_gd.py
+# launches Firefox via geckodriver (browser automation) and must never ship.
+bookmarklet.html
+test_bookmarklet_gd.py
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

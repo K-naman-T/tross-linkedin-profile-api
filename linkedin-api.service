@@ -1,0 +1,25 @@
+[Unit]
+Description=LinkedIn Profile API (reverse-engineered Voyager client, no browser automation)
+After=network.target
+
+[Service]
+# Run as a non-root user that owns the repo checkout.
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/linkedin-api
+# API is gated on API_KEY — without it anyone can drive your LinkedIn cookies.
+Environment=API_KEY=CHANGE_ME
+Environment=PORT=8099
+# Cookies: drop cookies.json into WorkingDirectory, or set the env var:
+# Environment=LINKEDIN_COOKIES={"li_at":"...", ...}
+ExecStart=/opt/linkedin-api/.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8099
+Restart=on-failure
+RestartSec=5
+# Keep the session alive: re-read the jar on restart, but cookies still expire
+# in 3-7 days -> redeploy cookies.json when the API starts returning 401.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
