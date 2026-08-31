@@ -115,7 +115,7 @@
 <h3>Decision · 2026-08-31 — Prod path vs dev path</h3>
 <p>Dev: full jar from Firefox. Prod: <code>cookies.json</code> or <code>LINKEDIN_COOKIES</code>. Gated by <code>API_KEY</code> (<code>main.py:62</code>).</p>
 <pre>curl -H "Authorization: Bearer $API_KEY" \
-  "https://nyc-direct-jail-those.trycloudflare.com/profile?slug=satyanadella"
+  "https://tross.knamant.dev/profile?slug=satyanadella"
 → {"status":"success","source":"linkedin_voyager_api",
    "data":{"basic":{"full_name":"Satya Nadella",
    "headline":"Chairman and CEO at Microsoft"}, … } }</pre>
@@ -142,7 +142,7 @@ cookie: li_at=AQFA…; JSESSIONID=:7664662659876785587; lidc=…; bcookie=…</p
 <pre>{"entityUrn":"urn:li:fsd_profile:AB00","firstName":"Ada","headline":"Mathematician",…}
 {"$type":"com.linkedin.voyager.identity.profile.Position","title":"Engineer","companyName":"Analytical Engine"}</pre>
   <h3>C — Tally submission links (required)</h3>
-  <p><code>Hosted API URL:</code> <a href="https://nyc-direct-jail-those.trycloudflare.com">https://nyc-direct-jail-those.trycloudflare.com</a> &nbsp;·&nbsp; <code>GitHub:</code> <a href="https://github.com/K-naman-T/tross-linkedin-profile-api">K-naman-T/tross-linkedin-profile-api</a></p>
+  <p><code>Hosted API URL:</code> <a href="https://tross.knamant.dev">https://tross.knamant.dev</a> &nbsp;·&nbsp; <code>GitHub:</code> <a href="https://github.com/K-naman-T/tross-linkedin-profile-api">K-naman-T/tross-linkedin-profile-api</a></p>
   <h3>D — Verification</h3>
   <p><code>pytest tests/test_client.py test_api_e2e.py -q</code> → <b>12 passed, 1 skipped</b> (live gate). <code>bash live_test.sh</code> → <b>LIVE TEST PASS</b>. <code>.gitignore</code> excludes <code>.env, cookies.json, bookmarklet.html, test_bookmarklet_gd.py</code> — the submitted repo is secret-free.</p>
 </div>
