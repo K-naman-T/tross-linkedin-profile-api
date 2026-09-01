@@ -87,7 +87,7 @@
 <h2>2. Auth recipe — Wall 1: 403 CSRF</h2>
 <h3>Wall · 2026-08-30 — Every naive scraper dies here</h3>
 <div class="wall"><b>Wall 1:</b> Sending only <code>li_at</code> returns <code>403 CSRF check failed</code>. LinkedIn checks <code>csrf-token == JSESSIONID</code> cookie (quotes stripped).</div>
-<p><b>Recipe (the part docs don't tell you):</b> <code>li_at</code> (login) + <code>JSESSIONID</code> (same session) + <code>csrf-token</code> header equal to <code>JSESSIONID.strip('"')</code> + <code>x-restli-protocol-version: 2.0.0</code> + <code>accept: application/vnd.linkedin.normalized+json+2.1</code>. If the jar lacks <code>JSESSIONID</code> we synthesize <code>:{19–20 digits}</code> — it is matched, not validated. We send the <em>full</em> <code>linkedin.com</code> jar (24 cookies: <code>lidc, bcookie, dfpfpt…</code>), not a leaked token — that is the fidelity fix. Implemented in <code>linkedin_scraper.py:149</code> via <code>curl_cffi.Session(impersonate="chrome")</code> for JA3.</p>
+<p><b>Recipe (the part docs don't tell you):</b> <code>li_at</code> (login) + <code>JSESSIONID</code> (same session) + <code>csrf-token</code> header equal to <code>JSESSIONID.strip('"')</code> + <code>x-restli-protocol-version: 2.0.0</code> + <code>accept: application/vnd.linkedin.normalized+json+2.1</code>. If the jar lacks <code>JSESSIONID</code> we synthesize a placeholder — it is matched, not validated. We send the <em>full</em> <code>linkedin.com</code> jar (24 cookies: <code>lidc, bcookie, dfpfpt…</code>), not a leaked token — that is the fidelity fix. Implemented in <code>linkedin_scraper.py:149</code> via <code>curl_cffi.Session(impersonate="chrome")</code> for JA3.</p>
 
 <h2>3. Response shape</h2>
 <h3>Decision · 2026-08-30 — Flat store dispatch</h3>
@@ -136,8 +136,8 @@ Host: www.linkedin.com
 accept: application/vnd.linkedin.normalized+json+2.1
 x-restli-protocol-version: 2.0.0
 x-li-lang: en_US
-csrf-token: :7664662659876785587
-cookie: li_at=AQFA…; JSESSIONID=:7664662659876785587; lidc=…; bcookie=…</pre>
+csrf-token: •••
+cookie: li_at=AQFA…; JSESSIONID=•••; lidc=…; bcookie=…</pre>
   <h3>B — Minimal <code>included[]</code> excerpt</h3>
 <pre>{"entityUrn":"urn:li:fsd_profile:AB00","firstName":"Ada","headline":"Mathematician",…}
 {"$type":"com.linkedin.voyager.identity.profile.Position","title":"Engineer","companyName":"Analytical Engine"}</pre>
